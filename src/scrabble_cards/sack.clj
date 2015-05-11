@@ -1,7 +1,7 @@
 (ns scrabble-cards.sack
   (:require [clojure.string :as string]))
 
-(def letters
+(def scrabble-letters
   "Scrabble letter distribution data"
   [[:blank 2 0]
    [\E 12 1]
@@ -31,7 +31,7 @@
    [\Q 1 10]
    [\Z 1 10]])
 
-(def sack
+(defn sack []
   (shuffle (flatten (map #(repeat (second %) (first %)) scrabble-letters))))
 
 (def points

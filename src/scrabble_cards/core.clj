@@ -1,9 +1,13 @@
-(ns scrabble-cards.core)
+(ns scrabble-cards.core
+  (:require [scrabble-cards.sack :as s]))
+
+(defn add-player [{:keys [deck players] :as game-state} player-id]
+  (let [new-player {:player-id player-id :cards (take 7 deck) :score 0}]
+    (merge game-state {:deck (drop 7 deck) :players (conj players new-player)})))
 
 (defn create-game [no-of-players]
-  {:deck []
-   :current-word ""
-   :players []})
+  (let [initial-state {:deck (s/sack) :current-word "" :players []}]
+    (reduce add-player initial-state (range no-of-players))))
 
 (defn initialise-game [no-of-players]
   (println "initialising" no-of-players "player game")
