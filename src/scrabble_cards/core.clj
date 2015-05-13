@@ -1,5 +1,9 @@
 (ns scrabble-cards.core
-  (:require [scrabble-cards.sack :as s]))
+  (:require [scrabble-cards.sack :as s]
+            [clojure.string :as str]))
+
+(def dictionary-file "src/scrabble_cards/british")
+(def all-words (str/split-lines (slurp dictionary-file)))
 
 (defn add-player [{:keys [deck players] :as game-state} player-id]
   (let [new-player {:player-id player-id :cards (take 7 deck) :score 0}]
@@ -16,25 +20,29 @@
 (defn still-going? [game-state]
   (-> game-state :deck empty? not))
 
-(defn valid-word? [word player]
-  true)
-
 (defn parse-input [word]
   (let [[_ a b c] (re-matches #"(.*)\[(.*)\](.*)" word)]
     {:players (str a c)
-     :board b})
+     :board b
+     :total (str a b c)}))
+
+(defn valid-word? [word cards]
+  (let [whole-word (str/lower-case (:total (parse-input word)))]
+  (if (= (str whole-word) (some #{(str whole-word)} dictionary-file))
+    true false)))
+
 
 (defn play-round
   [{:keys [deck players current-word] :as game-state}]
   (println "Current word:" current-word)
   (let [{:keys [player-id cards] :as current} (first players)]
     (println "Current Player:" player-id "Cards:" cards "What is your move?")
-    (let [line (read-line)
-          line (clojure.string/uppercase)
-          ]
-      (if (valid-word? (clojure.string/uppercase (read-line)))
-        (parse-input line)
-        )
+    (let [line (read-line)]
+      (if (valid-word? (str/upper-case line) cards)
+        (println (parse-input line))
+        (do
+          (println "not a valid word")
+          (play-round game-state))))
 
 
 
