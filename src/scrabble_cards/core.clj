@@ -46,7 +46,7 @@
       (if (valid-word? (str/upper-case line) cards)
         (if (letter-on-board? (str/upper-case line) current-word)
           (println "hello")
-          (print "world"))
+          (println "world"))
         (do
           (println "Not a valid word," (str (:total (parse-input line))) "is not in the dictionary")
           (play-round game-state))))
