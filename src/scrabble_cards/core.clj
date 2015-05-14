@@ -1,6 +1,7 @@
 (ns scrabble-cards.core
   (:require [scrabble-cards.sack :as s]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.set :as st]))
 
 (def dictionary-file "src/scrabble_cards/british")
 (def all-words (str/split-lines (slurp dictionary-file)))
@@ -36,6 +37,18 @@
   (if (= true (.contains current-word board))
     true false)))
 
+(defn has-letters-for-word? [word users-letters]
+  (empty? (st/difference (set word) (set users-letters))))
+
+(defn occurrences-in-str [character string]
+  (count (filter #{character} string)))
+
+(defn has-enough-letters? [word users-letters]
+ (every? (fn [character] (>= (occurrences-in-str character users-letters) (occurrences-in-str character word))) word))
+
+(defn player-has-cards? [word users-letters]
+  (and (has-letters-for-word? word users-letters) (has-enough-letters? word users-letters)))
+
 
 (defn play-round
   [{:keys [deck players current-word] :as game-state}]
@@ -43,10 +56,13 @@
   (let [{:keys [player-id cards] :as current} (first players)]
     (println "Current Player:" player-id "Cards:" cards "What is your move?")
     (let [line (read-line)]
+      (println line)
       (if (valid-word? (str/upper-case line) cards)
         (if (letter-on-board? (str/upper-case line) current-word)
-          (println "hello")
-          (println "world"))
+          (if (player-has-cards? (str/upper-case (:players (parse-input line))) (str/upper-case (str cards)))
+            (println "has letters")
+            (println "does not have letters"))
+          (println "letters not in current word"))
         (do
           (println "Not a valid word," (str (:total (parse-input line))) "is not in the dictionary")
           (play-round game-state))))
