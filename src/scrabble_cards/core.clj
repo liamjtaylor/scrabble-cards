@@ -28,7 +28,12 @@
 
 (defn valid-word? [word cards]
   (let [whole-word (str/lower-case (:total (parse-input word)))]
-  (if (= (str whole-word) (some #{(str whole-word)} dictionary-file))
+  (if (= whole-word (some #{whole-word} all-words))
+    true false)))
+
+(defn letter-on-board? [word current-word]
+  (let [board (str/lower-case (:board (parse-input word)))]
+  (if (= true (.contains current-word board))
     true false)))
 
 
@@ -39,9 +44,11 @@
     (println "Current Player:" player-id "Cards:" cards "What is your move?")
     (let [line (read-line)]
       (if (valid-word? (str/upper-case line) cards)
-        (println (parse-input line))
+        (if (letter-on-board? (str/upper-case line) current-word)
+          (println "hello")
+          (print "world"))
         (do
-          (println "not a valid word")
+          (println "Not a valid word," (str (:total (parse-input line))) "is not in the dictionary")
           (play-round game-state))))
 
 
