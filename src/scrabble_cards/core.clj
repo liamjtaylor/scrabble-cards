@@ -6,8 +6,21 @@
 (def dictionary-file "src/scrabble_cards/british")
 (def all-words (str/split-lines (slurp dictionary-file)))
 
+(def select-values (comp vals select-keys))
+
+(defn build-hand [memo card]
+  (if (> (first (select-values memo card)) 0)
+    (assoc memo card (+ (first (select-values memo card)) 1))
+    (assoc memo card 1)))
+
+(defn deal-hand [deck players]
+  (reduce {} (fn [memo card] (build-hand memo card)) (take 7 deck)))
+
+
+; {\A 0 :b 0 :c 0 :d 0 :e 0 :f 0 :g 0 :h 0 :i 0 :j 0 :k 0 :l 0 :m 0 :n 0 :o 0 :p 0 :q 0 :r 0 :s 0 :t 0 :u 0 :v 0 :w 0 :x 0 :y 0 :z 0}
+
 (defn add-player [{:keys [deck players] :as game-state} player-id]
-  (let [new-player {:player-id player-id :cards (take 7 deck) :score 0}]
+  (let [new-player {:player-id player-id :cards (deal-hand deck players) :score 0}]
     (merge game-state {:deck (drop 7 deck) :players (conj players new-player)})))
 
 (defn create-game [no-of-players]
@@ -52,7 +65,7 @@
 
 (defn play-round
   [{:keys [deck players current-word] :as game-state}]
-  (println "Current word:" current-word)
+  (println "Current word:" current-word players)
   (let [{:keys [player-id cards] :as current} (first players)]
     (println "Current Player:" player-id "Cards:" cards "What is your move?")
     (let [line (read-line)]
