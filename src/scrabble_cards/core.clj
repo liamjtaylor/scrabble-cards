@@ -10,8 +10,8 @@
 
 (defn build-hand [memo card]
   (if (> (first (select-values memo card)) 0)
-    (assoc memo card (+ (first (select-values memo card)) 1))
-    (assoc memo card 1)))
+    (assoc memo (keyword card) (+ (first (select-values memo card)) 1))
+    (assoc memo (keyword card) 1)))
 
 (defn deal-hand [deck players]
   (reduce {} (fn [memo card] (build-hand memo card)) (take 7 deck)))
